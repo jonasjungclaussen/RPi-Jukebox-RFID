@@ -122,6 +122,9 @@ shortcutCommands="^(setvolume|volumedown|volumeup|mute)$"
 
 autohotspot_service='autohotspot.service'
 
+STATE_FILE="/home/pi/RPi-Jukebox-RFID/state/player"
+STATE=$(cat "$STATE_FILE" 2>/dev/null)
+
 # Run the code from this block only, if the current command is not in "shortcutCommands"
 if [[ ! "$COMMAND" =~ $shortcutCommands ]]
 then
@@ -668,7 +671,12 @@ case $COMMAND in
             rm -f $VOLFILE
         fi
 
-        mpc next
+        if [ "$STATE" == "spotify" ]
+        then
+            /home/pi/spotify_scripts/spotify_transport.sh Next &
+        else
+            mpc next
+        fi
         ;;
     playerprev)
         # play previous track in playlist (==folder)
@@ -683,7 +691,12 @@ case $COMMAND in
             rm -f $VOLFILE
         fi
 
-        mpc prev
+        if [ "$STATE" == "spotify" ]
+        then
+            /home/pi/spotify_scripts/spotify_transport.sh Previous &
+        else
+            mpc prev
+        fi
         ;;
     playerprevchapter)
         CURRENT_SONG_ELAPSED_MS=$(sec_to_ms "$CURRENT_SONG_ELAPSED")
@@ -723,7 +736,7 @@ case $COMMAND in
             rm -f $VOLFILE
         fi
 
-	      mpc play 1
+        mpc play 1
         ;;
     playerpause)
         # toggle current track
@@ -740,7 +753,13 @@ case $COMMAND in
             # delete $VOLFILE
             rm -f $VOLFILE
         fi
-        mpc toggle
+
+        if [ "$STATE" == "spotify" ]
+        then
+            /home/pi/spotify_scripts/spotify_transport.sh PlayPause &
+        else
+            mpc toggle
+        fi
         ;;
     playerpauseforce)
         # pause current track with optional delay
@@ -787,6 +806,7 @@ case $COMMAND in
             #${PATHDATA}/resume_play.sh -c=resume -v=$VALUE
             mpc play $VALUE
         fi
+        echo "mpd" > /home/pi/RPi-Jukebox-RFID/state/player
         ;;
     playerremove)
         # remove selected song position
@@ -928,6 +948,8 @@ case $COMMAND in
             # delete $VOLFILE
             rm -f $VOLFILE
         fi
+
+        echo "mpd" > /home/pi/RPi-Jukebox-RFID/state/player
 
         # Now load and play
         if [ "${DEBUG_playout_controls_sh}" == "TRUE" ]; then echo "mpc load "${VALUE//\//SLASH}" && ${PATHDATA}/resume_play.sh -c=resume -d="${FOLDER}"" >> ${PATHDATA}/../logs/debug.log; fi

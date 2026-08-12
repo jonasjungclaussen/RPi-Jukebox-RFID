@@ -403,6 +403,21 @@ if [ "${DEBUG_rfid_trigger_play_sh}" == "TRUE" ]; then echo "# Type of play \$VA
 # check if $FOLDER is not empty
 if [ ! -z "$FOLDER" ]; then
 
+    # Patch for spotify playback
+    if [ -f "$AUDIOFOLDERSPATH/$FOLDER/spotify.uri" ]; then
+        PLAYLIST_ID=$(cat "$AUDIOFOLDERSPATH/$FOLDER/spotify.uri")
+        /home/pi/spotify_scripts/play_spotify.sh "$PLAYLIST_ID"
+        exit 0
+    fi
+
+    STATUS=$(curl -s http://localhost:3678/status | jq -r '.paused')
+
+    # Wenn Spotify spielt (paused=false), stoppen
+    if [ "$STATUS" == "false" ]; then
+        curl -X POST http://127.0.0.1:3678/player/stop
+        sleep 2.5
+    fi
+
     # If enabled sync audio folder $FOLDER
     if [ "${SYNCSHAREDENABLED}" == "TRUE" ]; then
         $PATHDATA/../components/synchronisation/sync-shared/sync-shared.sh -c=audiofolders -d="$FOLDER"
