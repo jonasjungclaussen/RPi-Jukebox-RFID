@@ -1,0 +1,13 @@
+# copy to /etc/systemd/system/mpd-volume-sync.service
+
+[Unit]
+Description=Sync MPD Volume to spotifyd via MPRIS
+After=mpd.service network.target
+
+[Service]
+ExecStart=/home/pi/RPi-Jukebox-RFID/spotify_scripts/mpd_volume_sync.sh
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
