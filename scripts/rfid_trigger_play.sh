@@ -406,7 +406,7 @@ if [ ! -z "$FOLDER" ]; then
     # Patch for spotify playback
     if [ -f "$AUDIOFOLDERSPATH/$FOLDER/spotify.uri" ]; then
         PLAYLIST_ID=$(cat "$AUDIOFOLDERSPATH/$FOLDER/spotify.uri")
-        /home/pi/spotify_scripts/play_spotify.sh "$PLAYLIST_ID"
+        /home/pi/RPi-Jukebox-RFID/spotify_scripts/play_spotify.sh "$PLAYLIST_ID"
         exit 0
     fi
 

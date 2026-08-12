@@ -673,7 +673,7 @@ case $COMMAND in
 
         if [ "$STATE" == "spotify" ]
         then
-            /home/pi/spotify_scripts/spotify_transport.sh Next &
+            /home/pi/RPi-Jukebox-RFID/spotify_scripts/spotify_transport.sh Next &
         else
             mpc next
         fi
@@ -693,7 +693,7 @@ case $COMMAND in
 
         if [ "$STATE" == "spotify" ]
         then
-            /home/pi/spotify_scripts/spotify_transport.sh Previous &
+            /home/pi/RPi-Jukebox-RFID/spotify_scripts/spotify_transport.sh Previous &
         else
             mpc prev
         fi
@@ -756,7 +756,7 @@ case $COMMAND in
 
         if [ "$STATE" == "spotify" ]
         then
-            /home/pi/spotify_scripts/spotify_transport.sh PlayPause &
+            /home/pi/RPi-Jukebox-RFID/spotify_scripts/spotify_transport.sh PlayPause &
         else
             mpc toggle
         fi

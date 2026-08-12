@@ -1,13 +1,14 @@
+# copy to /etc/systemd/system/spotify-add.service
+
 [Unit]
-Description=Spotify Add Web-Tool fuer Phoniebox
+Description=Spotify Add Web-Tool for Phoniebox
 After=network.target
 
 [Service]
 Type=simple
-# Passt die Pfade an, falls die Datei woanders liegt oder ein anderer User laeuft
 User=pi
 WorkingDirectory=/home/pi
-ExecStart=/usr/bin/python3 /home/pi/spotify_add_v3.py
+ExecStart=/usr/bin/python3 /home/pi/RPi-Jukebox-RFID/spotify_scripts/spotify_add.py
 Restart=on-failure
 RestartSec=5
 
