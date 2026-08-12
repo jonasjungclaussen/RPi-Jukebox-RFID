@@ -1,0 +1,31 @@
+# --- Spotify Login ---
+credentials:
+  type: "interactive"
+  client_id: "..."
+  client_secret: "..."
+
+# --- Gerätedaten ---
+device:
+  name: "phoniebox"
+  type: "speaker"
+  volume: 30          # Startlautstärke (0–100)
+
+# --- Audio Backend ---
+audio:
+  backend: "alsa"     # oder "pulseaudio"
+  format: "S16"       # S16, S24, S32, F32
+  device: "default"   # ALSA/Pulse Device (hw:0,0 würde exklusiv bedeuten)
+
+# --- Cache & Storage ---
+cache:
+  enabled: true
+  dir: "/var/cache/librespot"
+
+# --- Logging ---
+log:
+  level: "info"       # debug, info, warn, error
+
+# --- Server ---
+server:
+     enabled: true
+     port: 3678
