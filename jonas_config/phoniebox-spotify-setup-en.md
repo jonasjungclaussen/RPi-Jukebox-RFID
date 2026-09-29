@@ -148,6 +148,37 @@ corrupted, e.g. `state.json` with an invalid `\x00` character):
 systemctl --user stop go-librespot
 ```
 
+To avoid broken state files, add the automatic backup script in the librespot service:
+
+```
+# copy to /etc/systemd/system/go-librespot.service
+
+[Unit]
+Description=go-librespot Spotify Connect Client
+Wants=network-online.target
+After=network-online.target sound.target
+
+[Service]
+ExecStart=/usr/local/bin/go-librespot
+ExecStartPre=/home/pi/RPi-Jukebox-RFID/spotify_scripts/check-state.sh
+Restart=always
+User=pi
+Group=pi
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+
+# Optional: verhindert Knacken beim Neustart
+ExecStop=/usr/bin/curl -X POST http://127.0.0.1:3678/player/stop
+KillSignal=SIGTERM
+KillMode=process
+TimeoutStopSec=3
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+
 ## 4. Integration scripts for Phoniebox
 
 ### `play_spotify.sh`
