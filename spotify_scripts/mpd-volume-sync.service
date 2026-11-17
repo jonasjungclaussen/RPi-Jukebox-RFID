@@ -1,7 +1,7 @@
 # copy to /etc/systemd/system/mpd-volume-sync.service
 
 [Unit]
-Description=Sync MPD Volume to spotifyd via MPRIS
+Description=Sync MPD volume to go-librespot
 After=mpd.service network.target
 
 [Service]
