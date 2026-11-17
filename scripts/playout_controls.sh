@@ -209,6 +209,14 @@ then
     # SHUFFLE_STATUS=$(echo -e status\\nclose | nc -w 1 localhost 6600 | grep -o -P '(?<=random: ).*')
 fi # END COMMANDS SHORTCUT
 
+spotify_transport_async() {
+    local action="$1"
+    {
+        printf '%s action=%s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$action"
+        "${PATHDATA}/../spotify_scripts/spotify_transport.sh" "$action"
+    } >>"${PATHDATA}/../logs/spotify_transport.log" 2>&1 </dev/null &
+}
+
 case $COMMAND in
     shutdown)
         if [ "${DEBUG_playout_controls_sh}" == "TRUE" ]; then echo "   ${COMMAND}" >> ${PATHDATA}/../logs/debug.log; fi
@@ -673,7 +681,7 @@ case $COMMAND in
 
         if [ "$STATE" == "spotify" ]
         then
-            /home/pi/RPi-Jukebox-RFID/spotify_scripts/spotify_transport.sh Next &
+            spotify_transport_async Next
         else
             mpc next
         fi
@@ -693,7 +701,7 @@ case $COMMAND in
 
         if [ "$STATE" == "spotify" ]
         then
-            /home/pi/RPi-Jukebox-RFID/spotify_scripts/spotify_transport.sh Previous &
+            spotify_transport_async Previous
         else
             mpc prev
         fi
@@ -756,7 +764,7 @@ case $COMMAND in
 
         if [ "$STATE" == "spotify" ]
         then
-            /home/pi/RPi-Jukebox-RFID/spotify_scripts/spotify_transport.sh PlayPause &
+            spotify_transport_async PlayPause
         else
             mpc toggle
         fi
