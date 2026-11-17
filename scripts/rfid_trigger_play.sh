@@ -414,8 +414,10 @@ if [ ! -z "$FOLDER" ]; then
 
     # Stop Spotify only when it is actively playing before switching to MPD.
     if [ "$STATUS" == "true" ]; then
-        curl -X POST http://127.0.0.1:3678/player/stop
-        sleep 2.5
+        if ! curl --fail --silent --show-error --connect-timeout 2 --max-time 5 \
+            -X POST http://127.0.0.1:3678/player/stop -o /dev/null; then
+            logger -p user.err -t rfid_trigger_play "Spotify stop request failed before local playback"
+        fi
     fi
 
     # If enabled sync audio folder $FOLDER
