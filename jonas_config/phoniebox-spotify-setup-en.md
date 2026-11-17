@@ -115,31 +115,19 @@ loginctl enable-linger pi
 - **mpd-volume-sync.service** – user service; listens for `idle mixer`
   events from MPD and mirrors volume changes to the go-librespot API
 - **spotify-add.service** – system service (`/etc/systemd/system/`), see
-  example below
+  the checked-in unit at `spotify_scripts/spotify-add.service`
 
-After creating each one:
+Install the checked-in Spotify unit rather than maintaining a separate copy:
 ```bash
-sudo systemctl daemon-reload   # for system services
-systemctl --user daemon-reload # for user services
-systemctl enable --now <service>
+sudo cp /home/pi/RPi-Jukebox-RFID/spotify_scripts/spotify-add.service /etc/systemd/system/spotify-add.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now spotify-add.service
 ```
 
-Example `spotify-add.service`:
-```ini
-[Unit]
-Description=Spotify Add web tool for Phoniebox
-After=network.target
-
-[Service]
-Type=simple
-User=pi
-WorkingDirectory=/home/pi
-ExecStart=/usr/bin/python3 /home/pi/spotify_add.py
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
+For user services, reload and enable them with:
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now <service>
 ```
 
 **Always stop cleanly, never `kill -9`** (otherwise the state file can get
