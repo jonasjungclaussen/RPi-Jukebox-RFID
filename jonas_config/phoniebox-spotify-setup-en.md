@@ -22,8 +22,13 @@ cards; go-librespot runs in parallel and is only activated for Spotify cards.
 
 ## 2. Install & configure go-librespot
 
-Download the binary, make it executable, place it at a sensible path, e.g.
-`/home/pi/go-librespot/go-librespot`.
+Download a release from the [go-librespot releases page](https://github.com/devgianlu/go-librespot/releases).
+Version **v0.10.6** was verified on this Phoniebox. On a 32-bit Raspberry Pi
+OS (`dpkg --print-architecture` reports `armhf`), use
+`go-librespot_linux_armv6_rpi.tar.gz`; its SHA-256 is
+`868474c7679489a1441810a94982505118ca02bf512f5eec9c1d1f3230fddacc`.
+Install the extracted executable as `/usr/local/bin/go-librespot`, matching
+the systemd unit below.
 
 Example `config.yml`:
 
@@ -61,6 +66,11 @@ server:
   port: 3678
 ```
 
+Prepare the configured audio cache directory so the service can write to it:
+```bash
+sudo install -d -o pi -g pi -m 0750 /var/cache/librespot
+```
+
 **Important:**
 - The config key is `credentials:`, **not** `auth:`.
 - Use `type: interactive` (OAuth), **not** `client-credentials` – the latter
@@ -80,8 +90,9 @@ server:
    ```bash
    ssh -L <port>:localhost:<port> pi@<phoniebox-ip>
    ```
-3. Confirm successful login in the logs; credentials are stored in
-   `state.json` in the cache directory.
+3. Confirm successful login in the logs; credentials and player state are
+   stored in `/home/pi/.config/go-librespot/state.json`, separate from the
+   audio cache.
 
 ### Testing
 
@@ -106,12 +117,7 @@ Control endpoints:
 
 ## 3. Systemd services
 
-Once:
-```bash
-loginctl enable-linger pi
-```
-
-- **go-librespot.service** – user service (`~/.config/systemd/user/`)
+- **go-librespot.service** – system service (`/etc/systemd/system/`)
 - **mpd-volume-sync.service** – system service (`/etc/systemd/system/`); listens for `idle mixer`
   events from MPD and mirrors volume changes to the go-librespot API
 - **spotify-add.service** – system service (`/etc/systemd/system/`), see
@@ -119,52 +125,17 @@ loginctl enable-linger pi
 
 Install the checked-in system units rather than maintaining separate copies:
 ```bash
+sudo cp /home/pi/RPi-Jukebox-RFID/spotify_scripts/go-librespot.service /etc/systemd/system/go-librespot.service
 sudo cp /home/pi/RPi-Jukebox-RFID/spotify_scripts/mpd-volume-sync.service /etc/systemd/system/mpd-volume-sync.service
 sudo cp /home/pi/RPi-Jukebox-RFID/spotify_scripts/spotify-add.service /etc/systemd/system/spotify-add.service
 sudo systemctl daemon-reload
-sudo systemctl enable --now mpd-volume-sync.service spotify-add.service
-```
-
-For user services, reload and enable them with:
-```bash
-systemctl --user daemon-reload
-systemctl --user enable --now <service>
+sudo systemctl enable --now go-librespot.service mpd-volume-sync.service spotify-add.service
 ```
 
 **Always stop cleanly, never `kill -9`** (otherwise the state file can get
 corrupted, e.g. `state.json` with an invalid `\x00` character):
 ```bash
-systemctl --user stop go-librespot
-```
-
-To avoid broken state files, add the automatic backup script in the librespot service:
-
-```
-# copy to /etc/systemd/system/go-librespot.service
-
-[Unit]
-Description=go-librespot Spotify Connect Client
-Wants=network-online.target
-After=network-online.target sound.target
-
-[Service]
-ExecStart=/usr/local/bin/go-librespot
-ExecStartPre=/home/pi/RPi-Jukebox-RFID/spotify_scripts/check-state.sh
-Restart=always
-User=pi
-Group=pi
-Environment=PATH=/usr/local/bin:/usr/bin:/bin
-
-# Optional: verhindert Knacken beim Neustart
-ExecStop=/usr/bin/curl -X POST http://127.0.0.1:3678/player/stop
-KillSignal=SIGTERM
-KillMode=process
-TimeoutStopSec=3
-
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
+sudo systemctl stop go-librespot
 ```
 
 

@@ -7,7 +7,7 @@ After=network-online.target sound.target
 
 [Service]
 ExecStart=/usr/local/bin/go-librespot
-Restart=always
+ExecStartPre=/home/pi/RPi-Jukebox-RFID/spotify_scripts/check-state.sh
 User=pi
 Group=pi
 Environment=PATH=/usr/local/bin:/usr/bin:/bin
@@ -16,7 +16,7 @@ Environment=PATH=/usr/local/bin:/usr/bin:/bin
 ExecStop=/usr/bin/curl -X POST http://127.0.0.1:3678/player/stop
 KillSignal=SIGTERM
 KillMode=process
-TimeoutStopSec=3
+TimeoutStopSec=15
 
 Restart=on-failure
 
