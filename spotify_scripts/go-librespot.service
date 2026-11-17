@@ -16,7 +16,7 @@ Environment=PATH=/usr/local/bin:/usr/bin:/bin
 ExecStop=/usr/bin/curl -X POST http://127.0.0.1:3678/player/stop
 KillSignal=SIGTERM
 KillMode=process
-TimeoutStopSec=15
+TimeoutStopSec=60
 
 Restart=on-failure
 
