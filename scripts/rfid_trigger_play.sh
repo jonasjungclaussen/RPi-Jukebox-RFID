@@ -410,10 +410,10 @@ if [ ! -z "$FOLDER" ]; then
         exit 0
     fi
 
-    STATUS=$(curl -s http://localhost:3678/status | jq -r '.paused')
+    STATUS=$(curl -s http://localhost:3678/status | jq -r '(.stopped == false) and (.paused == false)')
 
-    # Wenn Spotify spielt (paused=false), stoppen
-    if [ "$STATUS" == "false" ]; then
+    # Stop Spotify only when it is actively playing before switching to MPD.
+    if [ "$STATUS" == "true" ]; then
         curl -X POST http://127.0.0.1:3678/player/stop
         sleep 2.5
     fi
