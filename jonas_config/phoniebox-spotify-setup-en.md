@@ -109,7 +109,7 @@ Control endpoints:
 | Purpose | Endpoint |
 |---|---|
 | Load album/track and play | `POST /player/load` (body: `uri`, `play`, optional `shuffle`) |
-| Toggle play/pause | `POST /player/play-pause` |
+| Toggle play/pause | `POST /player/playpause` |
 | Pause | `POST /player/pause` |
 | Resume | `POST /player/resume` |
 | Next track | `POST /player/next` |
@@ -148,7 +148,9 @@ sudo systemctl stop go-librespot
 
 ### `spotify_transport.sh`
 Play/pause/next/prev via the go-librespot API endpoints
-(`/player/play-pause`, `/player/next`, `/player/prev`).
+(`/player/playpause`, `/player/next`, `/player/prev`).
+Asynchronous transport results are logged in the system journal with the
+identifier `phoniebox-spotify-transport`.
 
 ### Patch in `rfid_trigger_play.sh`
 After the `$FOLDER` is determined: check whether a `spotify.uri` file exists

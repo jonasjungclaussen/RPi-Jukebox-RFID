@@ -211,10 +211,17 @@ fi # END COMMANDS SHORTCUT
 
 spotify_transport_async() {
     local action="$1"
-    {
-        printf '%s action=%s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$action"
-        "${PATHDATA}/../spotify_scripts/spotify_transport.sh" "$action"
-    } >>"${PATHDATA}/../logs/spotify_transport.log" 2>&1 </dev/null &
+    local output
+    local status
+    (
+        logger -t phoniebox-spotify-transport "action=$action started"
+        if output=$("${PATHDATA}/../spotify_scripts/spotify_transport.sh" "$action" 2>&1); then
+            logger -t phoniebox-spotify-transport "action=$action completed"
+        else
+            status=$?
+            logger -p user.err -t phoniebox-spotify-transport "action=$action failed (exit=$status): $output"
+        fi
+    ) </dev/null >/dev/null 2>&1 &
 }
 
 case $COMMAND in
